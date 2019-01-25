@@ -1,0 +1,12 @@
+E:\Projects\coresampleapp\bloodgrp-signalr-demo\bloodgrp-signal\bloodgrp-signal
+--output-path=obj\Release\netcoreapp2.0\
+--application-name=bloodgrp-signal
+--content-root=E:\Projects\coresampleapp\bloodgrp-signalr-demo\bloodgrp-signal\bloodgrp-signal
+--file=E:\Projects\coresampleapp\bloodgrp-signalr-demo\bloodgrp-signal\bloodgrp-signal\Views\Home\About.cshtml
+--file=E:\Projects\coresampleapp\bloodgrp-signalr-demo\bloodgrp-signal\bloodgrp-signal\Views\Home\Contact.cshtml
+--file=E:\Projects\coresampleapp\bloodgrp-signalr-demo\bloodgrp-signal\bloodgrp-signal\Views\Home\Index.cshtml
+--file=E:\Projects\coresampleapp\bloodgrp-signalr-demo\bloodgrp-signal\bloodgrp-signal\Views\Shared\Error.cshtml
+--file=E:\Projects\coresampleapp\bloodgrp-signalr-demo\bloodgrp-signal\bloodgrp-signal\Views\Shared\_Layout.cshtml
+--file=E:\Projects\coresampleapp\bloodgrp-signalr-demo\bloodgrp-signal\bloodgrp-signal\Views\Shared\_ValidationScriptsPartial.cshtml
+--file=E:\Projects\coresampleapp\bloodgrp-signalr-demo\bloodgrp-signal\bloodgrp-signal\Views\_ViewImports.cshtml
+--file=E:\Projects\coresampleapp\bloodgrp-signalr-demo\bloodgrp-signal\bloodgrp-signal\Views\_ViewStart.cshtml

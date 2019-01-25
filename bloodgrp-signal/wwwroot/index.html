@@ -1,0 +1,210 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta name="viewport" content="width=device-width">
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <!--<link href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" rel="stylesheet" />-->
+    <link href="css/site.css" rel="stylesheet" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <title>Blood Request Details</title>
+    <style>
+        /*input:invalid {
+            border: 1px solid red;
+        }
+        textarea:invalid {
+            border: 1px solid red;
+        }
+        input:valid {
+            border: 2px solid black;
+        }*/
+    </style>
+</head>
+<body>
+    
+    <div class="container">
+        <h3>Blood Request Details Form</h3>
+        <form id="frmblooddetails" action="#">
+            <div class="form-group">
+                <label>Name *</label>
+                <input class="form-control" required type="text" name="name" placeholder="name" id="name" />
+            </div>
+            <div class="form-group">
+                <label>Blood Group *</label>
+                <input class="form-control" required type="text" name="bloodgroup" placeholder="blood group" id="bloodgroup" />
+            </div>
+            <div class="form-group">
+                <label>Phone Number *</label>
+                <input class="form-control" required type="text" name="phonenumber" placeholder="phone number" id="phonenumber" />
+            </div>
+            <div class="form-group">
+                <label>Address *</label>
+                <textarea class="form-control" required id="address" name="address" cols="6" rows="6"
+                          placeholder="Address"></textarea>
+            </div>
+            <input type="submit" class="btn btn-default" onsubmit="SubmitForm();" value="Submit">
+            <input type="button" class="btn btn-default" onclick="document.getElementById('frmblooddetails').reset();" value="Clear">
+            <!--<button type="button" id="sendmessage" class="btn btn-default">Submit</button>-->
+        </form>
+    </div>
+    <div class="modal alert alert-danger fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div>Connection Error...</div>
+                    <div><strong style="font-size: 1.5em;">Hit Refresh/F5</strong> to rejoin. ;)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Reference the SignalR library. -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@aspnet/signalr@1.0.0/dist/browser/signalr.min.js"></script>
+
+    <!--Add script to update the page and send messages.-->
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', function () {
+            //function generateRandomName() {
+            //    return Math.random().toString(36).substring(2, 10);
+            //}
+            //// Get the user name and store it to prepend to messages.
+            var username = document.getElementById('name').value;
+            //var username = generateRandomName();
+            //var promptMessage = 'Enter your name:';
+            //do {
+            //    username = prompt(promptMessage, username);
+            //    if (!username || username.startsWith('_') || username.indexOf('<') > -1 || username.indexOf('>') > -1) {
+            //        username = '';
+            //        promptMessage = 'Invalid input. Enter your name:';
+            //    }
+            //} while(!username)
+            //// Set initial focus to message input box.
+            //var messageInput = document.getElementById('message');
+            //messageInput.focus();
+            function createMessageEntry(encodedName, encodedMsg) {
+                var entry = document.createElement('div');
+                entry.classList.add("message-entry");
+                if (encodedName === "_SYSTEM_") {
+                    entry.innerHTML = encodedMsg;
+                    entry.classList.add("text-center");
+                    entry.classList.add("system-message");
+                } else if (encodedName === "_BROADCAST_") {
+                    entry.classList.add("text-center");
+                    entry.innerHTML = `<div class="text-center broadcast-message">${encodedMsg}</div>`;
+                } else if (encodedName === username) {
+                    entry.innerHTML = `<div class="message-avatar pull-right">${encodedName}</div>` +
+                        `<div class="message-content pull-right">${encodedMsg}<div>`;
+                } else {
+                    entry.innerHTML = `<div class="message-avatar pull-left">${encodedName}</div>` +
+                        `<div class="message-content pull-left">${encodedMsg}<div>`;
+                }
+                return entry;
+            }
+            function bindConnectionMessage(connection) {
+                var messageCallback = function (name, message) {
+                    if (!message) return;
+                    // Html encode display name and message.
+                    var encodedName = name;
+                    var encodedMsg = message.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                    var messageEntry = createMessageEntry(encodedName, encodedMsg);
+
+                    var messageBox = document.getElementById('name');
+                    messageBox.appendChild(messageEntry);
+                    messageBox.scrollTop = messageBox.scrollHeight;
+                };
+                // Create a function that the hub can call to broadcast messages.
+                connection.on('dataupdateevent', messageCallback);
+                connection.on('echo', messageCallback);
+                connection.onclose(onConnectionError);
+            }
+            function createJSON() {
+                formDetails = document.forms[0];
+                var isValidForm = formDetails.checkValidity();
+                if (isValidForm) {
+                    item = {}
+                    item["name"] = formDetails.elements["name"].value;
+                    item["phonenumber"] = formDetails.elements["phonenumber"].value;
+                    item["bloodgroup"] = formDetails.elements["bloodgroup"].value;
+                    item["address"] = formDetails.elements["address"].value;
+                    return JSON.stringify(item);
+                }
+                else {
+                    return false;
+                }
+
+            }
+            function SubmitForm() {
+                var object = createJSON();
+                connection.send('dataupdateevent', document.getElementById("name").value , object);
+                alert("Hello " + document.getElementById("name").value + ', your details are saved.');
+                document.getElementById("frmblooddetails").reset(); 
+                event.preventDefault();
+            }
+            function onConnected(connection) {
+                console.log('connection started');
+              //  connection.send('dataupdateevent', '_SYSTEM_', 'charmi' + ' JOINED');
+                document.getElementById('frmblooddetails').addEventListener('submit', function (event) {
+                    SubmitForm();
+                });
+                
+                //document.getElementById('sendmessage').addEventListener('click', function (event) {
+                //    var object = createJSON();
+                   
+                //    if (object) {
+                //        connection.send('dataupdateevent', username, object);
+                //        alert("Hello " + document.getElementById("name").value + ', your details are saved.');
+                //        document.getElementById("frmblooddetails").reset();
+                //    }
+                    
+                //    // Call the dataupdateevent method on the hub.
+                //    //if (messageInput.value) {
+                //    //    connection.send('dataupdateevent', username, messageInput.value);
+                //    //}
+                //    // Clear text box and reset focus for next comment.
+                //    //messageInput.value = '';
+                //    //messageInput.focus();
+                //    event.preventDefault();
+                //});
+                //document.getElementById('message').addEventListener('keypress', function (event) {
+                //    if (event.keyCode === 13) {
+                //        event.preventDefault();
+                //        document.getElementById('sendmessage').click();
+                //        return false;
+                //    }
+                //});
+                //document.getElementById('echo').addEventListener('click', function (event) {
+                //    // Call the echo method on the hub.
+                //    connection.send('echo', username, messageInput.value);
+                //    // Clear text box and reset focus for next comment.
+                //    messageInput.value = '';
+                //    messageInput.focus();
+                //    event.preventDefault();
+                //});
+            }
+            function onConnectionError(error) {
+                if (error && error.message) {
+                    console.error(error.message);
+                }
+                var modal = document.getElementById('myModal');
+                modal.classList.add('in');
+                modal.style = 'display: block;';
+            }
+            var connection = new signalR.HubConnectionBuilder()
+                .withUrl('http://bloodgroupsampleapp.azurewebsites.net/bloodgrphub')
+                .build();
+            bindConnectionMessage(connection);
+            connection.start()
+                .then(function () {
+                    onConnected(connection);
+                })
+                .catch(function (error) {
+                    console.error(error.message);
+                });
+       });
+    </script>
+</body>
+</html>
