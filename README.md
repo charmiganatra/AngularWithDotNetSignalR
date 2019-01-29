@@ -12,5 +12,5 @@ app.UseSignalR(routes =>
 });
 6.	Create hub named as ‘notify’ and we are calling BroadcastMessage method that we defined in our ITypedHubClient interface. When we do that it will send the message to all connected clients.
 7.	Here we are adding SignalR route to the api. In this way we can connect the clients by adding <hostedurl>:<port>/notify (eg: http://bloodgroupsampleapp.azurewebsites.net/notify) in the client application.
-  for detail of this documentation please visit blog : https://charmiganatra.wordpress.com/2019/01/29/dot-net-core-web-app-signal-r-with-angular-5/
+8. for detail of this documentation please visit blog : https://charmiganatra.wordpress.com/2019/01/29/dot-net-core-web-app-signal-r-with-angular-5/
 
